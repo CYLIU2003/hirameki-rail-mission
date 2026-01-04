@@ -5,16 +5,18 @@
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>救援列車ミッション | Kiosk</title>
   <link rel="stylesheet" href="/common.css"/>
-  <style>
-    .headerIcon{ width:28px; height:28px; vertical-align:-6px; margin-right:8px; }
-  </style>
 </head>
 <body>
+  <div class="confettiOverlay" id="confetti"></div>
+
   <div class="container">
     <div class="row" style="justify-content:space-between; align-items:flex-end;">
-      <div>
-        <div class="h1"><img class="headerIcon" src="/assets/train.svg" alt="">救援列車ミッション</div>
-        <div class="muted">発車標ハッキングゲーム（操作端末）</div>
+      <div class="kidHeader">
+        <img src="/assets/mascot.svg" alt="">
+        <div>
+          <div class="h1">救援列車ミッション</div>
+          <div class="kidHint" id="kidModeLabel">（キッズモード）</div>
+        </div>
       </div>
       <div class="badge" id="connBadge">接続中…</div>
     </div>
@@ -28,8 +30,8 @@
 
     <!-- ATTRACT -->
     <section id="S_ATTRACT" class="card" style="margin-top:14px;">
-      <div class="h2">スタート</div>
-      <div class="p">カードを引いたら番号（01〜30）を入力。カードが無ければ「デッキから開始」でOKです。</div>
+      <div class="h2">①カード番号を入れる（または ルーレット）</div>
+      <div class="p">カードを引いたら番号（01〜30）を入力。なければ「ルーレット開始」でOK！</div>
 
       <div class="grid" style="grid-template-columns: 1fr 1fr; margin-top:12px;">
         <div class="card">
@@ -39,34 +41,37 @@
             <button class="btn" id="btnCardClear">クリア</button>
             <button class="btn primary" id="btnStartWithId">この番号で開始</button>
           </div>
-          <div class="muted" style="margin-top:8px;">ヒント：2桁（例：03）です。</div>
+          <div class="muted" style="margin-top:8px;">例：03 / 12</div>
         </div>
 
         <div class="card">
-          <div class="h2">スタッフ設定</div>
+          <div class="h2">②レベルをえらぶ</div>
           <div class="grid" style="grid-template-columns: 1fr 1fr; gap:10px;">
             <div>
               <div class="muted">難易度</div>
               <select class="select" id="selDifficulty">
-                <option value="EASY">EASY（成功体験）</option>
-                <option value="NORMAL" selected>NORMAL（標準）</option>
-                <option value="HARD">HARD（縛り）</option>
+                <option value="EASY">EASY（おすすめ）</option>
+                <option value="NORMAL" selected>NORMAL</option>
+                <option value="HARD">HARD（むずかしい）</option>
               </select>
             </div>
             <div>
               <div class="muted">モード</div>
               <select class="select" id="selMode">
-                <option value="NORMAL" selected>NORMAL（10ステップ）</option>
-                <option value="QUICK">QUICK（5ステップ）</option>
+                <option value="NORMAL" selected>NORMAL（10）</option>
+                <option value="QUICK">QUICK（5）</option>
               </select>
             </div>
           </div>
+
           <div class="row" style="margin-top:10px;">
-            <button class="btn primary big" id="btnStartDeck">デッキから開始（被りにくい）</button>
+            <button class="btn primary big" id="btnStartDeck">ルーレット開始（被りにくい）</button>
             <button class="btn danger" id="btnForceReset">強制リセット</button>
           </div>
+
           <div class="noteBox" style="margin-top:10px;">
-            マウス用ショートカット：<span class="kbd">Enter</span> 発車 / <span class="kbd">Space</span> 次へ / <span class="kbd">R</span> リセット
+            ③作戦をえらぶ → ④しゅっぱつ！<br/>
+            （マウス：<span class="kbd">Enter</span> しゅっぱつ / <span class="kbd">R</span> リセット）
           </div>
         </div>
       </div>
@@ -76,69 +81,54 @@
     <section id="S_BRIEFING" class="card hidden" style="margin-top:14px;">
       <div class="h2" id="briefTitle">ミッション</div>
       <div class="p" id="briefText"></div>
+      <div class="faceRow" id="briefFaces"></div>
       <hr/>
       <div class="grid" style="grid-template-columns: 1fr 1fr; gap:14px;">
         <div>
-          <div class="muted">目的</div>
+          <div class="muted">もくひょう</div>
           <div class="p" id="briefObjective"></div>
           <div style="margin-top:10px;">
-            <span class="badge warn"><img src="/assets/warning.svg" style="width:18px;height:18px;">ヒント</span>
+            <span class="badge warn">ヒント</span>
             <span class="muted" id="briefHint"></span>
           </div>
         </div>
         <div>
-          <div class="muted">縛り / 注意</div>
+          <div class="muted">ちゅうい（しばり）</div>
           <ul id="briefConstraints" style="margin:8px 0 0 18px; color:var(--muted); font-size:16px; line-height:1.55;"></ul>
         </div>
       </div>
       <div class="row" style="margin-top:14px; justify-content:flex-end;">
-        <button class="btn" id="btnBackToAttract">戻る</button>
-        <button class="btn primary big" id="btnToPlanning">作戦を組む</button>
+        <button class="btn" id="btnBackToAttract">もどる</button>
+        <button class="btn primary big" id="btnToPlanning">③作戦をえらぶ</button>
       </div>
     </section>
 
-    <!-- PLANNING -->
-    <section id="S_PLANNING" class="card hidden" style="margin-top:14px;">
-      <div class="h2">作戦（ルール）を2つまで選ぼう</div>
-      <div class="muted">※「IF（条件）」が当てはまるときに「THEN（対策）」が発動します。</div>
+    <!-- PLANNING (Kid Mode) -->
+    <section id="S_PLANNING_KID" class="card hidden" style="margin-top:14px;">
+      <div class="h2">③作戦をえらぼう（2つまで）</div>
+      <div class="muted">おもしろポイント：2つえらぶと“コンボ”っぽくなる！</div>
 
-      <div class="grid" style="grid-template-columns: 1fr 1fr; margin-top:12px;">
-        <div class="card">
-          <div class="h2">作戦①</div>
-          <div class="muted">IF（条件）</div>
-          <select class="select" id="rule1Cond"></select>
-          <div class="muted" style="margin-top:10px;">THEN（対策）</div>
-          <select class="select" id="rule1Act"></select>
-          <div class="noteBox" id="rule1Desc" style="margin-top:10px;"></div>
-        </div>
-
-        <div class="card">
-          <div class="h2">作戦②</div>
-          <div class="muted">IF（条件）</div>
-          <select class="select" id="rule2Cond"></select>
-          <div class="muted" style="margin-top:10px;">THEN（対策）</div>
-          <select class="select" id="rule2Act"></select>
-          <div class="noteBox" id="rule2Desc" style="margin-top:10px;"></div>
-          <div class="muted" style="margin-top:8px;" id="rule2Note"></div>
-        </div>
-      </div>
+      <div class="actionGrid" id="kidActionGrid"></div>
 
       <div class="card" style="margin-top:12px;">
-        <div class="h2">いまのスコア（初期）</div>
-        <div class="muted">出発後にどう変わるかは結果で見えるよ。</div>
+        <div class="h2">いまのスコア</div>
+        <div class="muted">顔がニコニコ（🙂）になるようにしよう！</div>
+
+        <div class="faceRow" id="planFaces"></div>
+
         <div class="progressWrap" style="margin-top:10px;">
           <div class="progressRow">
-            <div class="progressLabel">救援</div>
+            <div class="progressLabel">たすけ</div>
             <div class="progressBar"><div class="progressFill" id="kiosk_rescue_fill"></div></div>
             <div class="progressValue" id="kiosk_rescue_val"></div>
           </div>
           <div class="progressRow">
-            <div class="progressLabel">混雑</div>
+            <div class="progressLabel">こんざつ</div>
             <div class="progressBar"><div class="progressFill" id="kiosk_crowd_fill"></div></div>
             <div class="progressValue" id="kiosk_crowd_val"></div>
           </div>
           <div class="progressRow">
-            <div class="progressLabel">遅延</div>
+            <div class="progressLabel">おくれ</div>
             <div class="progressBar"><div class="progressFill" id="kiosk_delay_fill"></div></div>
             <div class="progressValue" id="kiosk_delay_val"></div>
           </div>
@@ -146,40 +136,43 @@
       </div>
 
       <div class="row" style="margin-top:14px; justify-content:flex-end;">
-        <button class="btn" id="btnPlanningBack">戻る</button>
-        <button class="btn primary big" id="btnToReady">出発準備へ</button>
+        <button class="btn" id="btnPlanningBackKid">もどる</button>
+        <button class="btn primary big" id="btnToReadyKid">④しゅっぱつじゅんび</button>
       </div>
     </section>
 
     <!-- READY -->
     <section id="S_READY" class="card hidden" style="margin-top:14px;">
-      <div class="h2">出発進行！</div>
-      <div class="p">大きいボタンで発車（EnterキーでもOK）。</div>
-      <div class="center" style="margin-top:18px;">
-        <button class="btn primary big" id="btnDepart">出発ボタン（Enter）</button>
+      <div class="h2">④しゅっぱつ！</div>
+      <div class="p">ボタンをおすと、3・2・1…で発車するよ。</div>
+      <div class="countdown small" id="countHint">（ボタンをおしてね）</div>
+      <div class="center" style="margin-top:12px;">
+        <button class="btn primary big" id="btnDepart">しゅっぱつ（Enter）</button>
       </div>
       <div class="row" style="margin-top:14px; justify-content:flex-end;">
-        <button class="btn" id="btnReadyBack">作戦を直す</button>
+        <button class="btn" id="btnReadyBack">作戦をなおす</button>
       </div>
     </section>
 
     <!-- RUNNING -->
     <section id="S_RUNNING" class="card hidden" style="margin-top:14px;">
-      <div class="h2">調整中…</div>
-      <div class="muted">発車標の表示が切り替わるよ。しばらく待ってね。</div>
+      <div class="h2">うごかしてるよ…</div>
+      <div class="muted">発車標が切りかわる！みててね！</div>
+      <div class="countdown" id="runCount">🚆</div>
+
       <div class="progressWrap" style="margin-top:12px;">
         <div class="progressRow">
-          <div class="progressLabel">救援</div>
+          <div class="progressLabel">たすけ</div>
           <div class="progressBar"><div class="progressFill" id="run_rescue_fill"></div></div>
           <div class="progressValue" id="run_rescue_val"></div>
         </div>
         <div class="progressRow">
-          <div class="progressLabel">混雑</div>
+          <div class="progressLabel">こんざつ</div>
           <div class="progressBar"><div class="progressFill" id="run_crowd_fill"></div></div>
           <div class="progressValue" id="run_crowd_val"></div>
         </div>
         <div class="progressRow">
-          <div class="progressLabel">遅延</div>
+          <div class="progressLabel">おくれ</div>
           <div class="progressBar"><div class="progressFill" id="run_delay_fill"></div></div>
           <div class="progressValue" id="run_delay_val"></div>
         </div>
@@ -196,27 +189,12 @@
         <span class="badge" id="resultBadgeName">称号：-</span>
         <span class="badge" id="resultBadgeCode">コード：----</span>
       </div>
-      <div class="progressWrap" style="margin-top:12px;">
-        <div class="progressRow">
-          <div class="progressLabel">救援</div>
-          <div class="progressBar"><div class="progressFill" id="res_rescue_fill"></div></div>
-          <div class="progressValue" id="res_rescue_val"></div>
-        </div>
-        <div class="progressRow">
-          <div class="progressLabel">混雑</div>
-          <div class="progressBar"><div class="progressFill" id="res_crowd_fill"></div></div>
-          <div class="progressValue" id="res_crowd_val"></div>
-        </div>
-        <div class="progressRow">
-          <div class="progressLabel">遅延</div>
-          <div class="progressBar"><div class="progressFill" id="res_delay_fill"></div></div>
-          <div class="progressValue" id="res_delay_val"></div>
-        </div>
-      </div>
+
+      <div class="faceRow" id="resultFaces"></div>
 
       <div class="row" style="margin-top:14px; justify-content:flex-end;">
-        <button class="btn" id="btnRetry">同じカードでもう一回</button>
-        <button class="btn primary big" id="btnShowCert">復旧証明書へ</button>
+        <button class="btn" id="btnRetry">もう一回（作戦をかえる）</button>
+        <button class="btn primary big" id="btnShowCert">証明書へ</button>
       </div>
     </section>
 
@@ -226,9 +204,9 @@
       <div class="card" style="margin-top:12px; border-radius:22px; position:relative; overflow:hidden;">
         <img src="/assets/pattern.svg" alt="" style="position:absolute; inset:0; opacity:0.18; width:100%; height:100%; object-fit:cover;">
         <div style="position:relative;">
-          <div class="h1" style="margin:0; display:flex; align-items:center; gap:10px;">
-            <img src="/assets/seal.svg" style="width:44px;height:44px;" alt="">
-            運行復旧 証明書
+          <div class="h1" style="margin:0; display:flex; align-items:center; gap:12px;">
+            <img src="/assets/star.svg" style="width:44px;height:44px;" alt="">
+            ★ 運行復旧 証明書 ★
           </div>
           <div class="muted" id="certWhen"></div>
           <hr/>
@@ -242,7 +220,7 @@
             <div>
               <div class="muted">コード（ランキング用）</div>
               <div class="h1" id="certCode" style="letter-spacing:4px;"></div>
-              <div class="muted">スコア（救援/混雑/遅延）</div>
+              <div class="muted">スコア（たすけ/こんざつ/おくれ）</div>
               <div class="p" id="certScores"></div>
             </div>
           </div>
@@ -250,7 +228,7 @@
       </div>
 
       <div class="row" style="margin-top:14px; justify-content:flex-end;">
-        <button class="btn" id="btnNext">次の人へ（リセット）</button>
+        <button class="btn primary big" id="btnNext">次の人へ（リセット）</button>
       </div>
     </section>
   </div>

@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="m" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#68a0ff"></stop>
+      <stop offset="1" stop-color="#58ffb0"></stop>
+    </linearGradient>
+  </defs>
+  <circle cx="128" cy="128" r="96" fill="url(#m)" opacity="0.18"></circle>
+  <circle cx="128" cy="128" r="86" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.20)" stroke-width="4"></circle>
+  <!-- hat -->
+  <path d="M78 92c12-26 88-26 100 0" fill="rgba(255,255,255,0.18)"></path>
+  <path d="M72 92h112" stroke="rgba(255,255,255,0.30)" stroke-width="10" stroke-linecap="round"></path>
+  <circle cx="128" cy="88" r="10" fill="rgba(255,255,255,0.35)"></circle>
+  <!-- face -->
+  <circle cx="98" cy="128" r="10" fill="rgba(255,255,255,0.40)"></circle>
+  <circle cx="158" cy="128" r="10" fill="rgba(255,255,255,0.40)"></circle>
+  <path d="M102 156c16 18 36 18 52 0" fill="none" stroke="rgba(255,255,255,0.45)" stroke-width="8" stroke-linecap="round"></path>
+  <!-- badge -->
+  <rect x="92" y="172" width="72" height="34" rx="14" fill="rgba(0,0,0,0.16)" stroke="rgba(255,255,255,0.18)" stroke-width="3"></rect>
+  <path d="M110 189h36" stroke="rgba(255,255,255,0.35)" stroke-width="6" stroke-linecap="round"></path>
+</svg>

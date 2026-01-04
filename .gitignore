@@ -1,0 +1,13 @@
+# dependencies
+node_modules/
+
+# runtime data / logs
+data/
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
