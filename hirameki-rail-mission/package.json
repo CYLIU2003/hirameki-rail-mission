@@ -1,0 +1,14 @@
+{
+  "name": "hirameki-rail-mission",
+  "version": "1.0.0",
+  "private": true,
+  "description": "夢祭向け：救援列車を走らせろ！発車標ハッキングゲーム（kiosk/display/admin）",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "ws": "^8.17.1"
+  }
+}

@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>救援列車ミッション | Admin</title>
+  <link rel="stylesheet" href="/common.css"/>
+</head>
+<body>
+  <div class="container">
+    <div class="row" style="justify-content:space-between; align-items:flex-end;">
+      <div>
+        <div class="h1">Admin</div>
+        <div class="muted">表示追従・初期設定・リセット・ログ</div>
+      </div>
+      <div class="badge" id="conn">接続中…</div>
+    </div>
+
+    <section class="card" style="margin-top:14px;">
+      <div class="h2">Display 追従</div>
+      <div class="row">
+        <button class="btn" id="btnFollowAuto">AUTO</button>
+        <input class="input" id="followId" placeholder="kiosk番号（例 1）" style="max-width:220px;"/>
+        <button class="btn primary" id="btnFollowSet">このKioskに固定</button>
+      </div>
+      <div class="muted" style="margin-top:8px;">AUTOは、最後に操作があったKioskを自動表示します。</div>
+    </section>
+
+    <section class="card" style="margin-top:14px;">
+      <div class="h2">デフォルト設定</div>
+      <div class="row">
+        <select class="select" id="defDifficulty" style="max-width:260px;">
+          <option value="EASY">EASY</option>
+          <option value="NORMAL" selected>NORMAL</option>
+          <option value="HARD">HARD</option>
+        </select>
+        <select class="select" id="defMode" style="max-width:260px;">
+          <option value="NORMAL" selected>NORMAL（10）</option>
+          <option value="QUICK">QUICK（5）</option>
+        </select>
+        <button class="btn primary" id="btnSetDefaults">反映</button>
+        <a class="btn" href="/api/export.csv" target="_blank" rel="noreferrer">CSV出力</a>
+      </div>
+    </section>
+
+    <section class="card" style="margin-top:14px;">
+      <div class="h2">Kiosk一覧</div>
+      <div id="list" class="grid" style="grid-template-columns:1fr 1fr; gap:12px;"></div>
+    </section>
+  </div>
+
+  <script src="/common.js"></script>
+  <script src="/admin.js"></script>
+</body>
+</html>

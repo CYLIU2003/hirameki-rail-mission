@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>救援列車ミッション | Display</title>
+  <link rel="stylesheet" href="/common.css"/>
+  <style>
+    body{ overflow:hidden; }
+    .stage{ width:1920px; height:1080px; transform-origin:0 0; }
+    .board{
+      font-weight:900;
+      letter-spacing:1px;
+      font-size:84px;
+      padding:18px 22px;
+      border-radius:20px;
+      background:rgba(255,255,255,0.06);
+      border:1px solid var(--border);
+    }
+    .boardSmall{ font-size:48px; font-weight:900; color:var(--muted); }
+    .alarm{
+      font-size:56px;
+      font-weight:900;
+      padding:14px 18px;
+      border-radius:18px;
+      border:1px solid rgba(255,107,107,0.35);
+      background:rgba(255,107,107,0.10);
+    }
+    .success{
+      border-color: rgba(88,255,176,0.35);
+      background:rgba(88,255,176,0.10);
+    }
+    .train{
+      width:520px; height:86px;
+      border-radius:18px;
+      border:1px solid var(--border);
+      background:rgba(255,255,255,0.06);
+      display:flex; align-items:center; gap:14px;
+      padding:12px 16px;
+    }
+    .trainCar{
+      width:58px; height:46px; border-radius:10px;
+      border:1px solid var(--border);
+      background:linear-gradient(180deg, rgba(104,160,255,0.25), rgba(88,255,176,0.16));
+    }
+    .overlay{
+      position:absolute; inset:0;
+      display:none;
+      align-items:center; justify-content:center;
+      background:rgba(0,0,0,0.45);
+      z-index:10;
+    }
+    .overlay.show{ display:flex; }
+    .overlayCard{
+      width:1200px;
+      border-radius:30px;
+      padding:28px;
+      background:linear-gradient(180deg, rgba(18,26,51,0.98), rgba(15,23,48,0.98));
+      border:1px solid var(--border);
+      box-shadow:0 40px 120px rgba(0,0,0,0.55);
+    }
+    .flash{
+      animation: flash 0.75s linear infinite;
+    }
+    @keyframes flash{
+      0%,100%{ filter:brightness(1); }
+      50%{ filter:brightness(1.35); }
+    }
+  </style>
+</head>
+<body>
+  <div class="overlay" id="ov">
+    <div class="overlayCard">
+      <div class="h1" id="ovTitle">成功！復旧完了！</div>
+      <div class="p" id="ovText">警報解除！定刻表示に戻りました。</div>
+      <div class="row" style="margin-top:14px;">
+        <span class="badge good" id="ovBadge1">称号：—</span>
+        <span class="badge" id="ovBadge2">総合：—</span>
+        <span class="badge" id="ovBadge3">コード：—</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="stage" id="stage">
+    <div class="container" style="max-width:1920px;">
+      <div class="row" style="justify-content:space-between; align-items:flex-end;">
+        <div>
+          <div class="h1" style="font-size:54px;">救援列車ミッション</div>
+          <div class="boardSmall" id="sub">あなたの作戦で運行を復旧せよ</div>
+        </div>
+        <div class="badge" id="dispFollow">FOLLOW: AUTO</div>
+      </div>
+
+      <div class="card" style="margin-top:14px;">
+        <div class="row" style="justify-content:space-between; align-items:center;">
+          <div class="board" id="boardLine">ひらめき線</div>
+          <div class="board" id="boardDest">救援特別</div>
+          <div class="board" id="boardTime">--:--</div>
+          <div class="board" id="boardPlat">1番線</div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:14px;">
+        <div class="row" style="justify-content:space-between; align-items:center;">
+          <div class="alarm flash" id="alarm">警報：待機中</div>
+          <div class="train" id="trainBox">
+            <div class="trainCar"></div><div class="trainCar"></div><div class="trainCar"></div><div class="trainCar"></div>
+            <div class="muted" style="font-size:26px; font-weight:900;">RUN</div>
+          </div>
+        </div>
+
+        <div class="progressWrap" style="margin-top:16px;">
+          <div class="progressRow" style="grid-template-columns:180px 1fr 90px;">
+            <div class="progressLabel" style="font-size:28px;">救援</div>
+            <div class="progressBar" style="height:22px;"><div class="progressFill" id="disp_rescue_fill"></div></div>
+            <div class="progressValue" id="disp_rescue_val" style="font-size:28px;"></div>
+          </div>
+          <div class="progressRow" style="grid-template-columns:180px 1fr 90px;">
+            <div class="progressLabel" style="font-size:28px;">混雑</div>
+            <div class="progressBar" style="height:22px;"><div class="progressFill" id="disp_crowd_fill"></div></div>
+            <div class="progressValue" id="disp_crowd_val" style="font-size:28px;"></div>
+          </div>
+          <div class="progressRow" style="grid-template-columns:180px 1fr 90px;">
+            <div class="progressLabel" style="font-size:28px;">遅延</div>
+            <div class="progressBar" style="height:22px;"><div class="progressFill" id="disp_delay_fill"></div></div>
+            <div class="progressValue" id="disp_delay_val" style="font-size:28px;"></div>
+          </div>
+        </div>
+
+        <div class="muted" style="margin-top:10px; font-size:26px;">
+          ステップ：<span id="dispStep">0</span>/<span id="dispTotal">10</span>　
+          <span id="dispMission">（待機中）</span>
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:14px; justify-content:space-between;">
+        <div class="badge" style="font-size:22px;">撮影OK：復旧証明書は操作端末に表示</div>
+        <div class="badge" style="font-size:22px;">Kioskが動くと自動追従します</div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/catalog.js"></script>
+  <script src="/common.js"></script>
+  <script src="/display.js"></script>
+</body>
+</html>

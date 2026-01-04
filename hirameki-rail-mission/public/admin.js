@@ -1,0 +1,74 @@
+const { ws, ready } = wsConnect({ role:"admin", kioskId:null });
+const conn = el("conn");
+
+let sessions = [];
+
+function render(){
+  const list = el("list");
+  list.innerHTML = "";
+  for (const s of sessions){
+    const div = document.createElement("div");
+    div.className = "card";
+    const title = document.createElement("div");
+    title.className = "h2";
+    title.textContent = `Kiosk #${s.kioskId} / ${s.state}`;
+    const meta = document.createElement("div");
+    meta.className = "muted";
+    meta.textContent = `card=${s.cardId||"-"} mode=${s.mode} diff=${s.difficulty} last=${fmtTime(s.lastActiveAt||Date.now())}`;
+    const row = document.createElement("div");
+    row.className = "row";
+    row.style.marginTop = "10px";
+    const btn = document.createElement("button");
+    btn.className = "btn danger";
+    btn.textContent = "リセット";
+    btn.onclick = () => ws.send(JSON.stringify({ type:"admin_reset_kiosk", kioskId: s.kioskId }));
+    row.appendChild(btn);
+
+    const btnFollow = document.createElement("button");
+    btnFollow.className = "btn";
+    btnFollow.textContent = "このKioskを表示";
+    btnFollow.onclick = () => ws.send(JSON.stringify({ type:"admin_set_display_follow", follow: String(s.kioskId) }));
+    row.appendChild(btnFollow);
+
+    div.appendChild(title);
+    div.appendChild(meta);
+    div.appendChild(row);
+    list.appendChild(div);
+  }
+}
+
+el("btnFollowAuto").onclick = () => ws.send(JSON.stringify({ type:"admin_set_display_follow", follow:"AUTO" }));
+el("btnFollowSet").onclick = () => {
+  const id = (el("followId").value || "").trim();
+  if (!id) return;
+  ws.send(JSON.stringify({ type:"admin_set_display_follow", follow:id }));
+};
+el("btnSetDefaults").onclick = () => {
+  ws.send(JSON.stringify({
+    type:"admin_set_defaults",
+    defaults: {
+      difficulty: el("defDifficulty").value,
+      mode: el("defMode").value,
+    }
+  }));
+};
+
+ws.addEventListener("message", (ev) => {
+  const msg = JSON.parse(ev.data);
+  if (msg.type === "hello_ack"){
+    conn.textContent = "接続OK";
+    conn.classList.add("good");
+    if (msg.adminSettings?.defaults){
+      el("defDifficulty").value = msg.adminSettings.defaults.difficulty;
+      el("defMode").value = msg.adminSettings.defaults.mode;
+    }
+  }
+  if (msg.type === "sessions"){
+    sessions = msg.sessions || [];
+    if (msg.adminSettings?.defaults){
+      el("defDifficulty").value = msg.adminSettings.defaults.difficulty;
+      el("defMode").value = msg.adminSettings.defaults.mode;
+    }
+    render();
+  }
+});
